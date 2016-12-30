@@ -15,11 +15,11 @@
 			if (typeof style.fontFamily === "undefined" || style.fontFamily === null)
 				continue;
 
-			if (style.fontFamily.match(/sans-serif/i) && style.fontFamily != 'sans-serif')
+			if (style.fontFamily.match(/sans-serif/i))
 				style.fontFamily = 'sans-serif';
-			else if (style.fontFamily.match(/serif/i) && style.fontFamily != 'serif')
+			else if (style.fontFamily.match(/serif/i))
 				style.fontFamily = 'serif';
-			else if (style.fontFamily.match(/monospace/i) && style.fontFamily != 'monospace')
+			else if (style.fontFamily.match(/monospace/i))
 				style.fontFamily = 'monospace';
 		}
 	}
