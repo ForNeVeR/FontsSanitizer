@@ -6,6 +6,10 @@
 // ==/UserScript==
 
 (function() {
+	"use strict";
+
+	var unreachableCSSQueue = [];
+
 	function handleRules(rules) {
 		for (var j = 0; j < rules.length; ++j) {
 			var style = rules[j].style;
@@ -24,24 +28,34 @@
 		}
 	}
 
+	function handleQueue() {
+		if (unreachableCSSQueue.length) {
+			handleUnreachableCSS(unreachableCSSQueue.pop());
+		}
+	}
+
 	function handleUnreachableCSS(cssAddress) {
+		console.log('FontsSanitizer processing CSS', cssAddress);
+
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
-			if (xhttp.readyState != 4 || xhttp.status != 200)
-				return;
+			if (xhttp.readyState == 4 && xhttp.status == 200) {
+				var text = xhttp.responseText;
 
-			var text = xhttp.responseText;
+				var match = text.match(/serif/i);
+				if (match == null || match.length < 1)
+					return;
 
-			var match = text.match(/serif/i);
-			if (match == null || match.length < 1)
-				return;
+				var styleElem = document.createElement("style");
+				styleElem.innerHTML = text;
+				document.getElementsByTagName("head")[0].appendChild(styleElem);
 
-			var styleElem = document.createElement("style");
-			styleElem.innerHTML = text;
-			document.getElementsByTagName("head")[0].appendChild(styleElem);
+				handleRules(styleElem.sheet.cssRules);
+			}
 
-			handleRules(styleElem.sheet.cssRules);
-		}
+			handleQueue();
+		};
+
 		xhttp.open("GET", cssAddress, true);
 		xhttp.send(null);
 	}
@@ -51,12 +65,14 @@
 			var cssObj = document.styleSheets[i];
 			var rules = cssObj.cssRules;
 			if (typeof rules === "undefined" || rules === null) {
-				handleUnreachableCSS(cssObj.href);
+				unreachableCSSQueue.push(cssObj.href);
 				continue;
 			}
 
 			handleRules(rules);
 		}
+
+		handleQueue();
 	}
 
 	fixCSS();
