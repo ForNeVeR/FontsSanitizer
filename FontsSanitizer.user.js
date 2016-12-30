@@ -25,28 +25,28 @@
 	}
 
 	function handleUnreachableCSS(cssAddress) {
-			var xhttp = new XMLHttpRequest();
-			xhttp.onreadystatechange = function() {
-				if (xhttp.readyState != 4 || xhttp.status != 200)
-					return;
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (xhttp.readyState != 4 || xhttp.status != 200)
+				return;
 
-				var text = xhttp.responseText;
+			var text = xhttp.responseText;
 
-				var match = text.match(/serif/i);
-				if (match == null || match.length < 1)
-					return;
+			var match = text.match(/serif/i);
+			if (match == null || match.length < 1)
+				return;
 
-				var styleElem = document.createElement("style");
-				styleElem.innerHTML = text;
-				document.getElementsByTagName("head")[0].appendChild(styleElem);
+			var styleElem = document.createElement("style");
+			styleElem.innerHTML = text;
+			document.getElementsByTagName("head")[0].appendChild(styleElem);
 
-				handleRules(styleElem.sheet.cssRules);
-			}
-			xhttp.open("GET", cssAddress, true);
-			xhttp.send(null);
+			handleRules(styleElem.sheet.cssRules);
+		}
+		xhttp.open("GET", cssAddress, true);
+		xhttp.send(null);
 	}
 
-	var fixCSS = function() {
+	function fixCSS() {
 		for (var i = 0; i < document.styleSheets.length; ++i) {
 			var cssObj = document.styleSheets[i];
 			var rules = cssObj.cssRules;
